@@ -1,8 +1,14 @@
-
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { Message, Persona, GradingResult, Sender, Language } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+
+// Safety check for API Key to prevent crash on load
+if (!apiKey) {
+  console.error("API_KEY is missing! AI features will not work.");
+}
+
+const ai = new GoogleGenAI({ apiKey: apiKey || "DUMMY_KEY_FOR_BUILD" });
 
 const MODEL_NAME = "gemini-2.5-flash";
 
@@ -35,11 +41,11 @@ You are acting as: {{PERSONA_JSON}}
 
 **BEHAVIOR RULES (STRICT):**
 
-1. **GENERAL/FUTURE QUESTIONS** (e.g., "How do you usually...?", "Would you like...?", "Is X hard?"):
+1. **GENERAL / FUTURE QUESTIONS** (e.g., "How do you usually...?", "Would you like...?", "Is X hard?"):
    - **RESPONSE:** Be vague, brief, and polite. Use < 20 words. Give generic answers ("It's okay", "I usually just manage").
    - **REASON:** People don't give good data to generic questions.
 
-2. **SPECIFIC/PAST/WORKFLOW QUESTIONS** (e.g., "Walk me through the last time...", "How exactly did you fix it yesterday?", "What happened next?"):
+2. **SPECIFIC / PAST / WORKFLOW QUESTIONS** (e.g., "Walk me through the last time...", "How exactly did you fix it yesterday?", "What happened next?"):
    - **RESPONSE:** Open up! Tell the specific story defined in your 'detailedWorkflow'. Reveal your 'emotionalTrigger'. Talk about the specific tools, costs, and frustrations.
    - **REASON:** Specific questions unlock the truth.
 
@@ -50,7 +56,7 @@ You are acting as: {{PERSONA_JSON}}
 
 **Analysis Role:**
 Also provide a critique of the user's question.
-- **Score (0-100):** Rate the question based on The Mom Test. 100 = Specific/Past/Digging. 0 = Pitching/Future/Generic.
+- **Score (0-100):** Rate the question based on The Mom Test. 100 = Specific / Past / Digging. 0 = Pitching / Future / Generic.
 - **Better Alternative:** Provide the PERFECT Mom Test question the user *should* have asked in this specific context.
 `;
 
@@ -61,7 +67,7 @@ Determine if the user "CLEARED THE LEVEL".
 **Win Condition (isLevelCleared = true):**
 1. The user successfully uncovered the **detailedWorkflow** or **emotionalTrigger** (The hidden truth).
 2. The user identified the REAL pain point, not just the surface one.
-3. The user proposed a relevant next step/solution based on that truth (Commitment).
+3. The user proposed a relevant next step / solution based on that truth (Commitment).
 
 **Scoring Rubric:**
 - **Past vs Future:** +20 for asking for specific stories. -20 for "Would you...".
@@ -215,11 +221,11 @@ export const generateHint = async (history: Message[], persona: Persona, lang: L
   try {
     const chatHistory = history.map((msg) => `${msg.sender}: ${msg.text}`).join("\n");
     const prompt = `
-    Persona: ${JSON.stringify(persona)}
-    History:
+Persona: ${JSON.stringify(persona)}
+History:
     ${chatHistory}
-    `;
-    
+`;
+
     const response = await ai.models.generateContent({
       model: MODEL_NAME,
       contents: prompt,
@@ -251,16 +257,16 @@ export const sendChatMessage = async (
 
     // Inject the detailed persona context into the prompt so the model acts specifically
     const prompt = `
-    [SYSTEM NOTE: Act as this specific Persona]
+[SYSTEM NOTE: Act as this specific Persona]
     ${JSON.stringify(persona)}
 
-    [User's Message]
+[User's Message]
     "${userMessage}"
 
-    [Instruction]
+  [Instruction]
     Respond based on the BEHAVIOR RULES defined in system instructions. 
-    If the user asks a GENERAL question -> Be vague/short.
-    If the user asks a SPECIFIC/WORKFLOW question -> Reveal the 'detailedWorkflow'.
+    If the user asks a GENERAL question -> Be vague / short.
+    If the user asks a SPECIFIC / WORKFLOW question -> Reveal the 'detailedWorkflow'.
     `;
 
     const response = await ai.models.generateContent({
@@ -289,7 +295,7 @@ export const generateGrading = async (history: Message[], persona: Persona, lang
     const prompt = `
     Persona Context (The Truth): ${JSON.stringify(persona)}
     Conversation Log:
-    ${conversationLog}
+  ${conversationLog}
     `;
 
     const response = await ai.models.generateContent({

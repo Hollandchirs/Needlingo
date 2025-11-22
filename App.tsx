@@ -35,7 +35,7 @@ const UI_TEXT = {
 };
 
 const App: React.FC = () => {
-  const [lang, setLang] = useState<Language>('zh'); 
+  const [lang, setLang] = useState<Language>('zh');
   const [persona, setPersona] = useState<Persona | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -60,7 +60,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const userTurns = messages.filter(m => m.sender === Sender.USER).length;
     if (userTurns >= MAX_TURNS && !gradingResult && !isGrading && !isLoading) {
-       handleFinish();
+      handleFinish();
     }
   }, [messages]);
 
@@ -76,7 +76,7 @@ const App: React.FC = () => {
 
       // Generate initial greeting from the persona
       const greetingData = await generateGreeting(newPersona, lang);
-      
+
       const greetingMsg: Message = {
         id: Date.now().toString(),
         text: greetingData.aiResponse.text,
@@ -115,10 +115,10 @@ const App: React.FC = () => {
     try {
       const { userAnalysis, aiResponse } = await sendChatMessage(messages, userText, persona, lang);
 
-      setMessages(prev => prev.map(msg => 
-        msg.id === tempId 
-        ? { ...msg, analysis: userAnalysis }
-        : msg
+      setMessages(prev => prev.map(msg =>
+        msg.id === tempId
+          ? { ...msg, analysis: userAnalysis }
+          : msg
       ));
 
       const aiMsg: Message = {
@@ -159,7 +159,7 @@ const App: React.FC = () => {
   };
 
   const toggleAnalysis = (id: string) => {
-    setMessages(prev => prev.map(msg => 
+    setMessages(prev => prev.map(msg =>
       msg.id === id ? { ...msg, isAnalysisVisible: !msg.isAnalysisVisible } : msg
     ));
   };
@@ -181,7 +181,7 @@ const App: React.FC = () => {
   const toggleLanguage = () => {
     const newLang = lang === 'en' ? 'zh' : 'en';
     setLang(newLang);
-    setTimeout(() => startNewSession(), 50); 
+    setTimeout(() => startNewSession(), 50);
   };
 
   const turnsUsed = messages.filter(m => m.sender === Sender.USER).length;
@@ -190,7 +190,7 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full max-w-2xl mx-auto bg-white shadow-2xl overflow-hidden border-x-2 border-slate-200 relative">
-      
+
       {/* Header */}
       <header className="bg-white border-b-2 border-slate-200 p-4 flex items-center justify-between shrink-0 z-20">
         <div className="flex items-center gap-3">
@@ -202,9 +202,9 @@ const App: React.FC = () => {
             <p className="text-slate-400 text-xs font-bold uppercase tracking-wide">{text.subtitle}</p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-2">
-          <button 
+          <button
             onClick={toggleLanguage}
             title="Switch Language (Restarts Session)"
             className="text-xs font-bold text-slate-500 hover:bg-slate-100 px-3 py-2 rounded-xl border-2 border-transparent hover:border-slate-200 transition-all flex items-center gap-1"
@@ -212,7 +212,7 @@ const App: React.FC = () => {
             <Globe size={16} />
             {lang === 'en' ? 'EN' : '中文'}
           </button>
-          <button 
+          <button
             onClick={startNewSession}
             disabled={isLoading}
             className="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold uppercase tracking-wide px-4 py-2 rounded-xl border-b-4 border-indigo-800 active:border-b-0 active:translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
@@ -225,10 +225,10 @@ const App: React.FC = () => {
 
       {/* Persona Card */}
       {persona && (
-        <PersonaCard 
-          persona={persona} 
-          isExpanded={isPersonaExpanded} 
-          toggleExpand={() => setIsPersonaExpanded(!isPersonaExpanded)} 
+        <PersonaCard
+          persona={persona}
+          isExpanded={isPersonaExpanded}
+          toggleExpand={() => setIsPersonaExpanded(!isPersonaExpanded)}
         />
       )}
 
@@ -242,32 +242,32 @@ const App: React.FC = () => {
         )}
 
         {persona && messages.length === 0 && isLoading && (
-           <div className="flex flex-col items-center justify-center h-full text-slate-400 animate-pulse">
-             <Loader2 size={48} className="animate-spin text-[#58CC02] mb-4" />
-             <p className="font-bold text-sm">{text.startPrompt}</p>
-           </div>
+          <div className="flex flex-col items-center justify-center h-full text-slate-400 animate-pulse">
+            <Loader2 size={48} className="animate-spin text-[#58CC02] mb-4" />
+            <p className="font-bold text-sm">{text.startPrompt}</p>
+          </div>
         )}
 
         {messages.map((msg) => (
-          <MessageBubble 
-            key={msg.id} 
-            message={msg} 
-            onToggleAnalysis={toggleAnalysis} 
+          <MessageBubble
+            key={msg.id}
+            message={msg}
+            onToggleAnalysis={toggleAnalysis}
           />
         ))}
-        
+
         {isLoading && messages.length > 0 && (
-           <div className="flex items-start gap-2 ml-1">
-             <div className="bg-white px-4 py-3 rounded-2xl border-2 border-slate-200 rounded-tl-none">
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                </div>
-             </div>
-           </div>
+          <div className="flex items-start gap-2 ml-1">
+            <div className="bg-white px-4 py-3 rounded-2xl border-2 border-slate-200 rounded-tl-none">
+              <div className="flex gap-1">
+                <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              </div>
+            </div>
+          </div>
         )}
-        
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -282,16 +282,16 @@ const App: React.FC = () => {
       {/* Controls */}
       <div className="p-4 bg-white border-t-2 border-slate-200 shrink-0 z-20">
         <div className="flex justify-between items-center mb-3 px-1">
-           <div className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">
-              {turnsLeft} {text.turnsLeft}
-           </div>
-           <button 
-             onClick={handleFinish}
-             disabled={messages.length < 2 || isLoading || isGrading}
-             className="text-xs font-bold text-red-500 hover:text-red-600 uppercase tracking-wide disabled:opacity-50 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors"
-           >
-             {text.endGrade}
-           </button>
+          <div className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">
+            {turnsLeft} {text.turnsLeft}
+          </div>
+          <button
+            onClick={handleFinish}
+            disabled={messages.length < 2 || isLoading || isGrading}
+            className="text-xs font-bold text-red-500 hover:text-red-600 uppercase tracking-wide disabled:opacity-50 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors"
+          >
+            {text.endGrade}
+          </button>
         </div>
 
         <div className="flex gap-2">
@@ -314,7 +314,7 @@ const App: React.FC = () => {
               {isHintLoading ? <Loader2 size={18} className="animate-spin" /> : <Lightbulb size={18} fill="currentColor" />}
             </button>
           </div>
-          
+
           <button
             onClick={handleSendMessage}
             disabled={!input.trim() || isLoading || isGrading || !persona}
@@ -327,10 +327,10 @@ const App: React.FC = () => {
 
       {/* Feedback Modal */}
       {gradingResult && (
-        <FeedbackModal 
-          result={gradingResult} 
+        <FeedbackModal
+          result={gradingResult}
           lang={lang}
-          onClose={startNewSession} 
+          onClose={startNewSession}
         />
       )}
     </div>
