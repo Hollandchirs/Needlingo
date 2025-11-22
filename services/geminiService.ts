@@ -1,11 +1,11 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { Message, Persona, GradingResult, Sender, Language } from "../types";
 
-const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+const apiKey = process.env.GEMINI_API_KEY;
 
 // Safety check for API Key to prevent crash on load
 if (!apiKey) {
-  console.error("API_KEY is missing! AI features will not work.");
+  console.error("GEMINI_API_KEY is missing! AI features will not work.");
 }
 
 const ai = new GoogleGenAI({ apiKey: apiKey || "DUMMY_KEY_FOR_BUILD" });
